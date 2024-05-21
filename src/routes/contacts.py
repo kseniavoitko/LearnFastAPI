@@ -24,7 +24,7 @@ async def get_contacts(
     current_user: User = Depends(auth_service.get_current_user),
 ):
     contacts = await repository_contacts.get_contacts(
-        limit, offset, firstname, lastname, email, birthdays, db
+        limit, offset, firstname, lastname, email, birthdays, db, current_user
     )
     return contacts
 
@@ -35,7 +35,7 @@ async def get_contact(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    contact = await repository_contacts.get_contact(contact_id, db)
+    contact = await repository_contacts.get_contact(contact_id, db, current_user)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return contact
@@ -47,7 +47,7 @@ async def create_contact(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    contact = await repository_contacts.create_contact(body, db)
+    contact = await repository_contacts.create_contact(body, db, current_user)
     return contact
 
 
@@ -58,7 +58,7 @@ async def update_contact(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    contact = await repository_contacts.update_contact(body, contact_id, db)
+    contact = await repository_contacts.update_contact(body, contact_id, db, current_user)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return contact
@@ -70,7 +70,7 @@ async def remove_contact(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    contact = await repository_contacts.remove_contact(contact_id, db)
+    contact = await repository_contacts.remove_contact(contact_id, db, current_user)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return contact

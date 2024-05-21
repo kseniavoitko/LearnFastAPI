@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from datetime import datetime
 
 
-from src.database.models import Contact
+from src.database.models import Contact, User
 from src.schemas import ContactModel
 
 
@@ -15,8 +15,9 @@ async def get_contacts(
     email: str,
     birthdays: bool,
     db: Session,
+    user: User,
 ):
-    contacts = db.query(Contact)
+    contacts = db.query(Contact).filter_by(user=user)
     if firstname:
         contacts = contacts.filter(Contact.firstname == firstname)
     if lastname:
@@ -29,18 +30,18 @@ async def get_contacts(
         return contacts.limit(limit).offset(offset).all()
 
 
-async def get_contact(contact_id: int, db: Session):
-    contact = db.query(Contact).filter_by(id=contact_id).first()
+async def get_contact(contact_id: int, db: Session, user: User):
+    contact = db.query(Contact).filter_by(id=contact_id, user=user).first()
     return contact
 
 
-async def create_contact(body: Contact, db: Session):
+async def create_contact(body: Contact, db: Session, user: User):
     contact = db.query(Contact).filter_by(email=body.email).first()
     if contact:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Email is exist!"
         )
-    contact = Contact(**body.dict())
+    contact = Contact(**body.dict(), user=user)
     db.add(contact)
     db.commit()
     db.refresh(contact)
@@ -48,8 +49,8 @@ async def create_contact(body: Contact, db: Session):
     return contact
 
 
-async def update_contact(body: ContactModel, contact_id: int, db: Session):
-    contact = db.query(Contact).filter_by(id=contact_id).first()
+async def update_contact(body: ContactModel, contact_id: int, db: Session, user: User):
+    contact = db.query(Contact).filter_by(id=contact_id, user=user).first()
     if contact:
         contact.firstname = body.firstname
         contact.lastname = body.lastname
@@ -60,8 +61,8 @@ async def update_contact(body: ContactModel, contact_id: int, db: Session):
     return contact
 
 
-async def remove_contact(contact_id: int, db: Session):
-    contact = db.query(Contact).filter_by(id=contact_id).first()
+async def remove_contact(contact_id: int, db: Session, user: User):
+    contact = db.query(Contact).filter_by(id=contact_id, user=user).first()
     if contact:
         db.delete(contact)
         db.commit()
