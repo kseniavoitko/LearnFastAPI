@@ -8,7 +8,7 @@ from src.schemas import UserModel
 
 async def get_user_by_email(email: str, db: Session) -> User | None:
     stmt = select(User).filter_by(email=email)
-    user = await db.execute(stmt)
+    user = db.execute(stmt)
     user = user.scalar_one_or_none()
     return user
 
@@ -25,4 +25,10 @@ async def create_user(body: UserModel, db: Session):
 
 async def update_token(user: User, refresh_token, db: Session):
     user.refresh_token = refresh_token
+    db.commit()
+
+
+async def confirmed_email(email: str, db: Session) -> None:
+    user = await get_user_by_email(email, db)
+    user.confirmed = True
     db.commit()

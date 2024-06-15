@@ -46,3 +46,7 @@ class ResponseContact(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class RequestEmail(BaseModel):
+    email: EmailStr
