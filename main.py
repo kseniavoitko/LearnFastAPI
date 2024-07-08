@@ -1,6 +1,7 @@
 import time
 
 from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -41,6 +42,7 @@ def healthchecker(db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Error connecting to the database")
 
+app.mount("/static", StaticFiles(directory='src/static'), name="static")
 
 app.include_router(auth.router, prefix='/api')
 app.include_router(contacts.router, prefix='/api')
