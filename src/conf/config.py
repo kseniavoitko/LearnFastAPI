@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     mail_server: str = "smtp.meta.ua"
     redis_host: str = "localhost"
     redis_port: int = 6379
-    redis_password: str
+    redis_password: str | None = None
 
     @field_validator("ALGORITHM", check_fields=False)
     @classmethod
