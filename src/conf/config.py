@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_password: str | None = None
+    cloudinary_name: str = 'name'
+    cloudinary_api_key: int = 326488457974591
+    cloudinary_api_secret: str = 'secret'
+
 
     @field_validator("ALGORITHM", check_fields=False)
     @classmethod
